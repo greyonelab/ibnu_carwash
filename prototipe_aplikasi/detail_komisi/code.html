@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pembagian Komisi - WashManager Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-secondary": "#ffffff",
+                    "tertiary": "#000000",
+                    "on-secondary-fixed-variant": "#003ea8",
+                    "primary-fixed-dim": "#bec6e0",
+                    "outline-variant": "#c6c6cd",
+                    "tertiary-fixed-dim": "#89ceff",
+                    "inverse-primary": "#bec6e0",
+                    "primary-fixed": "#dae2fd",
+                    "inverse-surface": "#213145",
+                    "secondary-container": "#316bf3",
+                    "outline": "#76777d",
+                    "surface-dim": "#cbdbf5",
+                    "tertiary-fixed": "#c9e6ff",
+                    "surface-variant": "#d3e4fe",
+                    "on-secondary-container": "#fefcff",
+                    "secondary-fixed": "#dbe1ff",
+                    "secondary": "#0051d5",
+                    "surface-container-high": "#dce9ff",
+                    "on-background": "#0b1c30",
+                    "on-tertiary-fixed": "#001e2f",
+                    "on-secondary-fixed": "#00174b",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-fixed": "#131b2e",
+                    "background": "#f8f9ff",
+                    "on-primary-container": "#7c839b",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "on-surface-variant": "#45464d",
+                    "primary": "#000000",
+                    "secondary-fixed-dim": "#b4c5ff",
+                    "surface-container-highest": "#d3e4fe",
+                    "surface-container-low": "#eff4ff",
+                    "on-tertiary-fixed-variant": "#004c6e",
+                    "surface": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#565e74",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffffff",
+                    "primary-container": "#131b2e",
+                    "on-tertiary-container": "#008cc7",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#001e2f",
+                    "on-surface": "#0b1c30",
+                    "error": "#ba1a1a",
+                    "surface-container": "#e5eeff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "4px",
+                    "xs": "8px",
+                    "gutter": "24px",
+                    "lg": "32px",
+                    "sm": "16px",
+                    "xl": "48px",
+                    "margin": "32px"
+            },
+            "fontFamily": {
+                    "h3": ["Inter"],
+                    "h1": ["Inter"],
+                    "h2": ["Inter"],
+                    "stats-num": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "stats-num": ["28px", {"lineHeight": "1", "letterSpacing": "-0.03em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f8f9ff;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 h-16 bg-white dark:bg-slate-950 shadow-[0px_1px_3px_rgba(15,23,42,0.08)] border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-4">
+<button class="active:opacity-80 transition-opacity hover:bg-slate-50 dark:hover:bg-slate-900 p-2 rounded-lg">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-50">menu</span>
+</button>
+<h1 class="text-lg font-bold tracking-tighter text-slate-900 dark:text-white">WashManager Pro</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="active:opacity-80 transition-opacity hover:bg-slate-50 dark:hover:bg-slate-900 p-2 rounded-lg">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-50">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-20 pb-24 px-4 md:px-gutter max-w-7xl mx-auto">
+<!-- Breadcrumb / Context -->
+<div class="mb-6">
+<span class="font-label-md text-label-md text-on-primary-container">PENDAPATAN &amp; KOMISI</span>
+<h2 class="font-h1 text-h1 text-primary mt-1">Detail Komisi</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Recent Transaction Breakdown -->
+<div class="lg:col-span-7 flex flex-col gap-gutter">
+<!-- Transaction Card -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-[0px_1px_3px_rgba(15,23,42,0.08)]">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<h3 class="font-h3 text-h3">Interior Detail Premium</h3>
+<p class="font-body-md text-on-surface-variant">TXN #88291 • Hari Ini, 11:45</p>
+</div>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md px-3 py-1 rounded-full uppercase">Selesai</span>
+</div>
+<!-- Visual Breakdown -->
+<div class="space-y-6">
+<div class="flex justify-between items-end border-b border-slate-100 pb-4">
+<span class="font-body-lg text-on-surface-variant">Total Harga Transaksi</span>
+<span class="font-stats-num text-stats-num text-primary">$120.00</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Employee Share -->
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant/30">
+<div class="flex items-center gap-2 mb-2 text-secondary">
+<span class="material-symbols-outlined text-[20px]">engineering</span>
+<span class="font-label-md text-label-md">BAGIAN KARYAWAN</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-stats-num text-stats-num">40%</span>
+<span class="font-h2 text-h2 text-secondary">$48.00</span>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a male employee wearing a professional uniform with a friendly expression in a workshop setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpuHbcfVb2YUPIhAkKBpmtrpZDL4iHp4Gqxd07hX9y_LQ6folqHqE9NOwOZ-dr_vQ4bpU2JSIoevHSkaG5Mgd5R_29nPbOetME-ex3YNwyOuaDZV_xQ1JbQeOVB-wtwVPXWc-N3bgnd-SbTmIQbExYqnzytCcATJWgfr1wRYRxXEgb3iCkpqs0KXNIEjPgv4_VH_MtVtbs6ttBX7a9DjmoW2tplreW45PSwQYpSYu5PfRMCirrMbPIqhrDAcRY-2j0Q-lchXmXxdo"/>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Marcus Chen</span>
+</div>
+</div>
+<!-- Owner Share -->
+<div class="bg-surface-container-low p-md rounded-lg border border-outline-variant/30">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+<span class="font-label-md text-label-md">BAGIAN PEMILIK</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-stats-num text-stats-num">60%</span>
+<span class="font-h2 text-h2 text-primary">$72.00</span>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[20px]">business_center</span>
+</div>
+<span class="font-body-md font-semibold text-on-surface">Akun Operasional</span>
+</div>
+</div>
+</div>
+<!-- Mini Map/Location Decorator -->
+<div class="h-32 rounded-xl overflow-hidden relative">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="Abstract aerial view of a city grid with blue and slate color grading and glowing highlights on main roads" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB84G2ntE6kPvwjOmOMaNt5u3-Uio8IuxQcVbJ7EAPkMb8IHnJs43XjOzU08_vj6gGl_jGDhWSfopn_dLyqVVZKTuMJCtQBiT0nmIkkFlYguKn6mdaDwxMAhXulnPwyA2W_5UKv4D4bl2EtybeTtLzd63lesnqEjKbeS_N_lUI8683kT3EW44eky6J7k9h-repbcf2MmX0kVgOMIXim8xpy5o1T8MASvoHwA3nBfKLBQ3ZJ0Ii5urID589a0FslyzlP4KUxf11e9ss"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+<div class="absolute bottom-4 left-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span class="font-label-md text-label-md">Bay 4 • Pusat Utama</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Action Grid -->
+<div class="grid grid-cols-2 gap-sm">
+<button class="flex flex-col items-start p-md bg-white border border-outline-variant rounded-xl hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-2">print</span>
+<span class="font-body-md font-bold">Cetak Resi</span>
+</button>
+<button class="flex flex-col items-start p-md bg-white border border-outline-variant rounded-xl hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-secondary mb-2">edit_square</span>
+<span class="font-body-md font-bold">Atur Pembagian</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Daily Earnings List -->
+<div class="lg:col-span-5">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_1px_3px_rgba(15,23,42,0.08)] sticky top-24">
+<div class="p-md border-b border-slate-100 flex justify-between items-center">
+<h3 class="font-h3 text-h3">Pendapatan Hari Ini</h3>
+<span class="font-label-md text-label-md text-secondary">LIHAT SEMUA</span>
+</div>
+<div class="p-4 space-y-2">
+<!-- Employee Item -->
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border-2 border-surface-container-high overflow-hidden group-hover:border-secondary transition-colors">
+<img class="w-full h-full object-cover" data-alt="Portrait of Marcus Chen, professional car detailer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_AOBddiqs9SMwSAajt8ktuNVpvTdUo2ryeedt03nHgFDcd3RMjZSTpZamgziHq9VfceZQayhdh_aK4P_sB5YdbfzWo-C0_61RUyLfZOl7G6WUhrHxh5iGTeIktFVRzpEIr3hnrfwhoGyJMaoECYWzdELvOZmfM_UxOGtElHicHhR7hj88wQWV-3ZdKZXAAzV7J_ZZbunvLCUKal7tadtpv0fYgwoCWj2HfO5yZU3fEYl6KReukyCUwhD0FZDzPi77Z-NzkBbuIhw"/>
+</div>
+<div>
+<p class="font-body-md font-bold">Marcus Chen</p>
+<p class="font-label-md text-on-surface-variant">5 Cuci Selesai</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-h3 text-h3 text-primary">$182.40</p>
+<p class="font-label-md text-secondary">Diperoleh Hari Ini</p>
+</div>
+</div>
+<!-- Employee Item -->
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border-2 border-surface-container-high overflow-hidden group-hover:border-secondary transition-colors">
+<img class="w-full h-full object-cover" data-alt="Portrait of a female service manager in a professional setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDTcyKHh0kkSMqz3HIz5tev8w4EY59bqLo1FDOGBTsCjOeM5cgZyP4eCC-T-cK8iY5M3CsOSjkDUBA8cyz_e0Wpskv7iP5fUtRSD6qUoFXlSG3BC5V-uOZ3owrvJnFHB7hBKtMHx1ok9sqa05lGIitJ3KJLVfJXvXUHf4zQY616LqwegHyKRjwKn_EFZRmhbruZUg8eLuhwvwxFC3iChDraO42y45pDtNS9MKv9XdMuJ-iaIpQZlBWqta6C5pwOu6f-ROWEykjIKs"/>
+</div>
+<div>
+<p class="font-body-md font-bold">Sarah Jenkins</p>
+<p class="font-label-md text-on-surface-variant">4 Cuci Selesai</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-h3 text-h3 text-primary">$145.20</p>
+<p class="font-label-md text-secondary">Diperoleh Hari Ini</p>
+</div>
+</div>
+<!-- Employee Item -->
+<div class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border-2 border-surface-container-high overflow-hidden group-hover:border-secondary transition-colors">
+<img class="w-full h-full object-cover" data-alt="Portrait of a male employee with a smile, blurred car wash background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0sCxSLs805EDP2Hgd3dLS8ZwSQplSdutxW_gjPt99dsWJSl5h0w9Wtnxq4zRLAVVW7aRGg0bJjCj7_gqtAcqZNPm-Xru_DyaNN2vgAQ3QHtZ2R2UIkpQJd3129QamJth2s_crpIIQAyHEeQmotNhEwggA3QutVBwpsrf28VFGMEGx1AMUY8eu5RSm5NsRPvugrtBgblp8qgB-I5bTo0WPOxlQfTLg8XDFlkeJPmgD8rwH-0saTG9w3uNE0mKzF1nrP-Vn7FZuHQs"/>
+</div>
+<div>
+<p class="font-body-md font-bold">David Miller</p>
+<p class="font-label-md text-on-surface-variant">7 Cuci Selesai</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-h3 text-h3 text-primary">$212.00</p>
+<p class="font-label-md text-secondary">Diperoleh Hari Ini</p>
+</div>
+</div>
+</div>
+<!-- Summary Widget -->
+<div class="m-4 p-md bg-primary-container text-white rounded-xl">
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-md opacity-80 uppercase tracking-widest">Total Pembayaran Hari Ini</span>
+<span class="material-symbols-outlined opacity-60">payments</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-stats-num text-[32px]">$539.60</span>
+<span class="text-xs text-secondary-fixed-dim font-semibold">+12% vs kemarin</span>
+</div>
+<div class="mt-4 h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container w-3/4 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-white/95 dark:bg-slate-950/95 backdrop-blur-md shadow-[0px_-1px_3px_rgba(15,23,42,0.06)] border-t border-slate-200 dark:border-slate-800 md:hidden">
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1 hover:text-slate-700 dark:hover:text-slate-200 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-sans text-[11px] font-medium">Beranda</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1 hover:text-slate-700 dark:hover:text-slate-200 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="local_car_wash">local_car_wash</span>
+<span class="font-sans text-[11px] font-medium">Cuci Baru</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-sans text-[11px] font-medium">Komisi</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-3 py-1 hover:text-slate-700 dark:hover:text-slate-200 scale-95 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="font-sans text-[11px] font-medium">Laporan</span>
+</a>
+</nav>
+<!-- Hidden for Mobile FAB -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-secondary-container text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform md:hidden">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>
