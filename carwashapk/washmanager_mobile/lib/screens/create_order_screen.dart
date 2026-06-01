@@ -51,6 +51,12 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       'color': Colors.blue,
       'description': 'Sedan, hatchback, SUV, MPV, dll'
     },
+    {
+      'type': 'Lainnya',
+      'icon': Icons.local_shipping,
+      'color': Colors.green,
+      'description': 'Truk, bus, pickup, dll'
+    },
   ];
 
   final List<String> _paymentMethods = [
@@ -188,6 +194,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           : null,
       serviceId: _selectedService!.id,
       staffIds: _selectedStaff.map((s) => s.id).toList(),
+      washLaneId: _autoAssignLane ? null : _selectedWashLane?.id,
       additionalFee: _additionalFeeController.text.isNotEmpty 
           ? int.tryParse(_additionalFeeController.text) 
           : null,
@@ -900,7 +907,22 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                         ),
                       )
                     else
-                      ...orderProvider.services.map((service) {
+                      ...orderProvider.services.where((service) {
+                        // Filter services based on vehicle type
+                        if (_selectedVehicleType == null) return true;
+                        
+                        final vehicleCategory = _selectedVehicleType!.toLowerCase();
+                        final serviceCategory = service.category?.toLowerCase() ?? 'mobil';
+                        
+                        // Map vehicle types to categories
+                        if (vehicleCategory == 'motor') {
+                          return serviceCategory == 'motor';
+                        } else if (vehicleCategory == 'mobil') {
+                          return serviceCategory == 'mobil';
+                        } else {
+                          return serviceCategory == 'lainnya';
+                        }
+                      }).map((service) {
                         final isSelected = _selectedService?.id == service.id;
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
@@ -940,12 +962,36 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          service.name,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                service.name,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                service.category ?? 'mobil',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey.shade700,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         Text(
                                           service.description,
@@ -983,6 +1029,44 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                           ),
                         );
                       }),
+                    // Show message if no services match the filter
+                    if (!orderProvider.isLoading && 
+                        orderProvider.services.isNotEmpty &&
+                        _selectedVehicleType != null &&
+                        !orderProvider.services.any((service) {
+                          final vehicleCategory = _selectedVehicleType!.toLowerCase();
+                          final serviceCategory = service.category?.toLowerCase() ?? 'mobil';
+                          
+                          if (vehicleCategory == 'motor') {
+                            return serviceCategory == 'motor';
+                          } else if (vehicleCategory == 'mobil') {
+                            return serviceCategory == 'mobil';
+                          } else {
+                            return serviceCategory == 'lainnya';
+                          }
+                        }))
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                size: 48,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Tidak ada layanan untuk $_selectedVehicleType',
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 16),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/order_provider.dart';
 import '../models/wash_order.dart';
+import '../services/api_service.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -394,13 +395,135 @@ class _OrderCard extends StatelessWidget {
   }
 }
 
-class _OrderDetailsSheet extends StatelessWidget {
+class _OrderDetailsSheet extends StatefulWidget {
   final WashOrder order;
 
   const _OrderDetailsSheet({required this.order});
 
   @override
+  State<_OrderDetailsSheet> createState() => _OrderDetailsSheetState();
+}
+
+class _OrderDetailsSheetState extends State<_OrderDetailsSheet> {
+  bool _isUpdating = false;
+
+  // Status flow: pending → in_progress → completed
+  String? _getNextStatus(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return 'in_progress';
+      case 'in_progress':
+        return 'completed';
+      default:
+        return null;
+    }
+  }
+
+  String _getNextStatusLabel(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return 'Mulai Proses';
+      case 'in_progress':
+        return 'Selesai';
+      default:
+        return '';
+    }
+  }
+
+  IconData _getNextStatusIcon(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return Icons.play_arrow_rounded;
+      case 'in_progress':
+        return Icons.check_circle_rounded;
+      default:
+        return Icons.check;
+    }
+  }
+
+  Color _getNextStatusColor(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return const Color(0xFF3B82F6);
+      case 'in_progress':
+        return const Color(0xFF10B981);
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Future<void> _updateStatus(BuildContext context) async {
+    final nextStatus = _getNextStatus(widget.order.status);
+    if (nextStatus == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Konfirmasi'),
+        content: Text(
+          nextStatus == 'completed'
+              ? 'Tandai order ${widget.order.orderNumber} sebagai selesai?'
+              : 'Mulai proses order ${widget.order.orderNumber}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _getNextStatusColor(widget.order.status),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text(_getNextStatusLabel(widget.order.status)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isUpdating = true);
+
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final success = await orderProvider.updateOrderStatus(widget.order.id, nextStatus);
+
+    if (!mounted) return;
+    setState(() => _isUpdating = false);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            nextStatus == 'completed'
+                ? 'Order berhasil diselesaikan'
+                : 'Order mulai diproses',
+          ),
+          backgroundColor: _getNextStatusColor(widget.order.status),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(orderProvider.errorMessage ?? 'Gagal update status'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final nextStatus = _getNextStatus(widget.order.status);
+
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       maxChildSize: 0.9,
@@ -444,11 +567,11 @@ class _OrderDetailsSheet extends StatelessWidget {
                       _DetailSection(
                         title: 'Order Information',
                         children: [
-                          _DetailRow('Order Number', order.orderNumber),
-                          _DetailRow('Status', order.status.toUpperCase()),
-                          _DetailRow('Payment Status', order.paymentStatus.toUpperCase()),
-                          if (order.paymentMethod != null)
-                            _DetailRow('Payment Method', order.paymentMethod!.toUpperCase()),
+                          _DetailRow('Order Number', widget.order.orderNumber),
+                          _DetailRow('Status', widget.order.status.toUpperCase()),
+                          _DetailRow('Payment Status', widget.order.paymentStatus.toUpperCase()),
+                          if (widget.order.paymentMethod != null)
+                            _DetailRow('Payment Method', widget.order.paymentMethod!.toUpperCase()),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -456,12 +579,12 @@ class _OrderDetailsSheet extends StatelessWidget {
                       _DetailSection(
                         title: 'Vehicle Information',
                         children: [
-                          _DetailRow('License Plate', order.vehicle?.licensePlate ?? 'Unknown'),
-                          _DetailRow('Type', order.vehicle?.type ?? 'Unknown'),
-                          if (order.vehicle?.model != null)
-                            _DetailRow('Model', order.vehicle!.model!),
-                          if (order.vehicle?.color != null)
-                            _DetailRow('Color', order.vehicle!.color!),
+                          _DetailRow('License Plate', widget.order.vehicle?.licensePlate ?? 'Unknown'),
+                          _DetailRow('Type', widget.order.vehicle?.type ?? 'Unknown'),
+                          if (widget.order.vehicle?.model != null)
+                            _DetailRow('Model', widget.order.vehicle!.model!),
+                          if (widget.order.vehicle?.color != null)
+                            _DetailRow('Color', widget.order.vehicle!.color!),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -469,10 +592,10 @@ class _OrderDetailsSheet extends StatelessWidget {
                       _DetailSection(
                         title: 'Service Information',
                         children: [
-                          _DetailRow('Service', order.service?.name ?? 'Unknown'),
-                          _DetailRow('Type', order.service?.type ?? 'Unknown'),
-                          _DetailRow('Duration', '${order.service?.durationMinutes ?? 0} minutes'),
-                          _DetailRow('Staff', order.staff?.name ?? 'Unknown'),
+                          _DetailRow('Service', widget.order.service?.name ?? 'Unknown'),
+                          _DetailRow('Type', widget.order.service?.type ?? 'Unknown'),
+                          _DetailRow('Duration', '${widget.order.service?.durationMinutes ?? 0} minutes'),
+                          _DetailRow('Staff', widget.order.staff?.name ?? 'Unknown'),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -480,23 +603,23 @@ class _OrderDetailsSheet extends StatelessWidget {
                       _DetailSection(
                         title: 'Pricing',
                         children: [
-                          _DetailRow('Base Price', 'Rp ${_formatCurrency(order.basePrice)}'),
-                          if (order.additionalFee > 0)
-                            _DetailRow('Additional Fee', 'Rp ${_formatCurrency(order.additionalFee)}'),
+                          _DetailRow('Base Price', 'Rp ${_formatCurrency(widget.order.basePrice)}'),
+                          if (widget.order.additionalFee > 0)
+                            _DetailRow('Additional Fee', 'Rp ${_formatCurrency(widget.order.additionalFee)}'),
                           _DetailRow(
                             'Total Price', 
-                            'Rp ${_formatCurrency(order.totalPrice)}',
+                            'Rp ${_formatCurrency(widget.order.totalPrice)}',
                             isTotal: true,
                           ),
                         ],
                       ),
                       
-                      if (order.notes != null) ...[
+                      if (widget.order.notes != null) ...[
                         const SizedBox(height: 16),
                         _DetailSection(
                           title: 'Notes',
                           children: [
-                            Text(order.notes!),
+                            Text(widget.order.notes!),
                           ],
                         ),
                       ],
@@ -512,19 +635,46 @@ class _OrderDetailsSheet extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Close'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Tutup'),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Implement status update
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Update Status'),
+                  if (nextStatus != null) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: _isUpdating ? null : () => _updateStatus(context),
+                        icon: _isUpdating
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(_getNextStatusIcon(widget.order.status), size: 20),
+                        label: Text(
+                          _isUpdating ? 'Memproses...' : _getNextStatusLabel(widget.order.status),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _getNextStatusColor(widget.order.status),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ],

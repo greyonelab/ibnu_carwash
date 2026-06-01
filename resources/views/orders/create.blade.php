@@ -84,6 +84,24 @@
                 </div>
 
                 <div>
+                    <label for="vehicle_category" class="block text-sm font-medium text-slate-700 mb-2">Kategori Kendaraan *</label>
+                    <select 
+                        id="vehicle_category" 
+                        name="vehicle_category" 
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('vehicle_category') border-red-300 @enderror"
+                        required
+                    >
+                        <option value="">Pilih Kategori</option>
+                        <option value="mobil" {{ old('vehicle_category') === 'mobil' ? 'selected' : '' }}>Mobil</option>
+                        <option value="motor" {{ old('vehicle_category') === 'motor' ? 'selected' : '' }}>Motor</option>
+                        <option value="lainnya" {{ old('vehicle_category') === 'lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    </select>
+                    @error('vehicle_category')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label for="vehicle_model" class="block text-sm font-medium text-slate-700 mb-2">Model/Merk</label>
                     <input 
                         type="text" 
@@ -119,9 +137,9 @@
         <div class="bg-white p-6 rounded-xl border border-slate-200">
             <h2 class="text-lg font-semibold text-slate-900 mb-4">Pilih Layanan</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div id="service-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach($services as $service)
-                <label class="relative flex flex-col p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-blue-300 transition-colors group">
+                <label class="service-card relative flex flex-col p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-blue-300 transition-colors group" data-category="{{ $service->category ?? 'mobil' }}">
                     <input 
                         type="radio" 
                         name="service_id" 
@@ -147,8 +165,15 @@
                         <span class="text-lg font-bold text-blue-600">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
                         <span class="text-xs text-slate-500">{{ $service->duration_minutes }} mnt</span>
                     </div>
+                    <div class="mt-2">
+                        <span class="inline-block px-2 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded">{{ ucfirst($service->category ?? 'mobil') }}</span>
+                    </div>
                 </label>
                 @endforeach
+            </div>
+            <div id="no-service-message" class="hidden text-center py-8 text-slate-500">
+                <span class="material-symbols-outlined text-4xl mb-2 block">info</span>
+                <p>Tidak ada layanan untuk kategori yang dipilih</p>
             </div>
             @error('service_id')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -437,6 +462,46 @@
     
     // Event listeners
     document.addEventListener('DOMContentLoaded', function() {
+        // Vehicle category filter for services
+        const vehicleCategorySelect = document.getElementById('vehicle_category');
+        const serviceCards = document.querySelectorAll('.service-card');
+        const serviceContainer = document.getElementById('service-container');
+        const noServiceMessage = document.getElementById('no-service-message');
+        
+        function filterServices() {
+            const selectedCategory = vehicleCategorySelect.value;
+            let visibleCount = 0;
+            
+            serviceCards.forEach(card => {
+                const serviceCategory = card.dataset.category;
+                const radio = card.querySelector('input[type="radio"]');
+                
+                if (!selectedCategory || serviceCategory === selectedCategory) {
+                    card.style.display = 'flex';
+                    radio.disabled = false;
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                    radio.disabled = true;
+                    radio.checked = false;
+                }
+            });
+            
+            // Show/hide no service message
+            if (visibleCount === 0 && selectedCategory) {
+                serviceContainer.style.display = 'none';
+                noServiceMessage.classList.remove('hidden');
+            } else {
+                serviceContainer.style.display = 'grid';
+                noServiceMessage.classList.add('hidden');
+            }
+            
+            // Recalculate price after filtering
+            updatePriceAndCommission();
+        }
+        
+        vehicleCategorySelect.addEventListener('change', filterServices);
+        
         // Price calculation events
         document.querySelectorAll('input[name="service_id"]').forEach(radio => {
             radio.addEventListener('change', updatePriceAndCommission);

@@ -36,16 +36,33 @@
                 <!-- Category -->
                 <div>
                     <label for="category" class="block text-sm font-medium text-slate-700 mb-2">
-                        Kategori <span class="text-red-500">*</span>
+                        Kategori Kendaraan <span class="text-red-500">*</span>
                     </label>
                     <select id="category" name="category" required
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('category') border-red-500 @enderror">
                         <option value="">Pilih Kategori</option>
-                        <option value="standard" {{ old('category') == 'standard' ? 'selected' : '' }}>Standard</option>
-                        <option value="premium" {{ old('category') == 'premium' ? 'selected' : '' }}>Premium</option>
-                        <option value="detail" {{ old('category') == 'detail' ? 'selected' : '' }}>Detail</option>
+                        <option value="mobil" {{ old('category') == 'mobil' ? 'selected' : '' }}>Mobil</option>
+                        <option value="motor" {{ old('category') == 'motor' ? 'selected' : '' }}>Motor</option>
+                        <option value="lainnya" {{ old('category') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                     @error('category')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Type -->
+                <div>
+                    <label for="type" class="block text-sm font-medium text-slate-700 mb-2">
+                        Tipe Layanan <span class="text-red-500">*</span>
+                    </label>
+                    <select id="type" name="type" required
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('type') border-red-500 @enderror">
+                        <option value="">Pilih Tipe</option>
+                        <option value="standard" {{ old('type') == 'standard' ? 'selected' : '' }}>Standard</option>
+                        <option value="premium" {{ old('type') == 'premium' ? 'selected' : '' }}>Premium</option>
+                        <option value="detail" {{ old('type') == 'detail' ? 'selected' : '' }}>Detail</option>
+                    </select>
+                    @error('type')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

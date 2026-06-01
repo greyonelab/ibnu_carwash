@@ -445,6 +445,27 @@ class ApiService {
     }
   }
 
+  // Vehicle History
+  Future<Map<String, dynamic>> getVehicleHistory(int vehicleId) async {
+    try {
+      print('🔄 API: Loading vehicle history for id: $vehicleId');
+      final response = await _dio.get('/vehicles/$vehicleId/history');
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        return {
+          'success': true,
+          'data': response.data['data'],
+        };
+      }
+      return {'success': false, 'message': 'Failed to load vehicle history'};
+    } on DioException catch (e) {
+      print('❌ Vehicle history error: ${e.response?.data}');
+      return {
+        'success': false,
+        'message': e.response?.data['message'] ?? 'Network error',
+      };
+    }
+  }
+
   // Vehicle Search
   Future<List<Map<String, dynamic>>> searchVehicles(String query, String? vehicleType) async {
     try {

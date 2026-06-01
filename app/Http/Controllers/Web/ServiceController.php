@@ -27,7 +27,8 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration_minutes' => 'required|integer|min:1',
-            'category' => 'required|string|in:standard,premium,detail',
+            'type' => 'required|string|in:standard,premium,detail',
+            'category' => 'required|string|in:mobil,motor,lainnya',
             'is_active' => 'boolean'
         ]);
 
@@ -42,6 +43,7 @@ class ServiceController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'duration_minutes' => $request->duration_minutes,
+            'type' => $request->type,
             'category' => $request->category,
             'is_active' => $request->has('is_active')
         ]);
@@ -73,7 +75,8 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration_minutes' => 'required|integer|min:1',
-            'category' => 'required|string|in:standard,premium,detail',
+            'type' => 'required|string|in:standard,premium,detail',
+            'category' => 'required|string|in:mobil,motor,lainnya',
             'is_active' => 'boolean'
         ]);
 
@@ -88,6 +91,7 @@ class ServiceController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'duration_minutes' => $request->duration_minutes,
+            'type' => $request->type,
             'category' => $request->category,
             'is_active' => $request->has('is_active')
         ]);

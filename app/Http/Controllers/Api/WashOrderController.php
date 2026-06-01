@@ -7,6 +7,7 @@ use App\Models\WashOrder;
 use App\Models\Vehicle;
 use App\Models\Service;
 use App\Models\Staff;
+use App\Models\WashLane;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -55,6 +56,7 @@ class WashOrderController extends Controller
             'service_id' => 'required|exists:services,id',
             'staff_ids' => 'required|array|min:1',
             'staff_ids.*' => 'exists:staff,id',
+            'wash_lane_id' => 'nullable|exists:wash_lanes,id',
             'additional_fee' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
             'payment_method' => 'nullable|in:cash,qris,transfer',
@@ -79,10 +81,32 @@ class WashOrderController extends Controller
             // Generate order number
             $orderNumber = $this->generateOrderNumber();
 
+            // Handle wash lane assignment
+            $washLane = null;
+            $queuePosition = null;
+
+            if ($request->wash_lane_id) {
+                $washLane = WashLane::find($request->wash_lane_id);
+                if ($washLane && $washLane->canAcceptOrder()) {
+                    $queuePosition = $washLane->next_queue_position;
+                } else {
+                    $washLane = null;
+                }
+            }
+
+            if (!$washLane) {
+                $washLane = WashLane::getAvailableLane($request->vehicle_type);
+                if ($washLane) {
+                    $queuePosition = $washLane->next_queue_position;
+                }
+            }
+
             // Tentukan status berdasarkan auto_complete
-            $status = $request->auto_complete ? 'completed' : 'pending';
+            $autoComplete = filter_var($request->auto_complete, FILTER_VALIDATE_BOOLEAN);
+            $status = $autoComplete ? 'completed' : 'pending';
             $paymentStatus = $request->payment_method ? 'paid' : 'unpaid';
-            $completedAt = $request->auto_complete ? now() : null;
+            $completedAt = $autoComplete ? now() : null;
+            $startedAt = $autoComplete ? now() : null;
 
             $washOrder = WashOrder::create([
                 'vehicle_id' => $vehicle->id,
@@ -90,6 +114,8 @@ class WashOrderController extends Controller
                 'staff_id' => $request->staff_ids[0], // Keep first staff for backward compatibility
                 'staff_ids' => $request->staff_ids,
                 'user_id' => auth()->id(),
+                'wash_lane_id' => $washLane?->id,
+                'queue_position' => $queuePosition,
                 'order_number' => $orderNumber,
                 'base_price' => $service->price,
                 'additional_fee' => $additionalFee,
@@ -97,7 +123,9 @@ class WashOrderController extends Controller
                 'status' => $status,
                 'payment_status' => $paymentStatus,
                 'payment_method' => $request->payment_method,
+                'started_at' => $startedAt,
                 'completed_at' => $completedAt,
+                'queued_at' => $autoComplete ? null : now(),
                 'notes' => $request->notes
             ]);
 

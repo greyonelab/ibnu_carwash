@@ -7,6 +7,7 @@ class Service {
   final int id;
   final String name;
   final String type;
+  final String? category;
   final String description;
   @JsonKey(fromJson: _priceFromJson)
   final int price;
@@ -23,6 +24,7 @@ class Service {
     required this.id,
     required this.name,
     required this.type,
+    this.category,
     required this.description,
     required this.price,
     required this.durationMinutes,

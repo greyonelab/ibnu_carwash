@@ -161,9 +161,9 @@ class ReportsController extends Controller
             ->get();
         
         // Hourly Distribution
-        $hourlyStats = WashOrder::whereBetween('wash_orders.created_at', [$startDate, $endDate])
+        $hourlyStats = WashOrder::whereBetween('wash_orders.created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->where('status', 'completed')
-            ->selectRaw('CAST(strftime("%H", wash_orders.created_at) AS INTEGER) as hour, COUNT(*) as count')
+            ->selectRaw('HOUR(wash_orders.created_at) as hour, COUNT(*) as count')
             ->groupBy('hour')
             ->orderBy('hour')
             ->get();

@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::where('is_active', true)->get();
+        $query = Service::where('is_active', true);
+        
+        // Filter by category if provided
+        if ($request->has('category') && in_array($request->category, ['mobil', 'motor', 'lainnya'])) {
+            $query->where('category', $request->category);
+        }
+        
+        $services = $query->get();
         
         return response()->json([
             'success' => true,
@@ -35,7 +42,8 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration_minutes' => 'required|integer|min:1',
-            'type' => 'required|in:standard,premium,detail'
+            'type' => 'required|in:standard,premium,detail',
+            'category' => 'required|in:mobil,motor,lainnya'
         ]);
 
         $service = Service::create($request->all());
@@ -56,7 +64,8 @@ class ServiceController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration_minutes' => 'required|integer|min:1',
-            'type' => 'required|in:standard,premium,detail'
+            'type' => 'required|in:standard,premium,detail',
+            'category' => 'required|in:mobil,motor,lainnya'
         ]);
 
         $service->update($request->all());

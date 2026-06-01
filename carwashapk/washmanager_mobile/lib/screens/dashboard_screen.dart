@@ -872,17 +872,85 @@ class _ModernQuickActionCard extends StatelessWidget {
   }
 }
 
-class _ModernOrderCard extends StatelessWidget {
+class _ModernOrderCard extends StatefulWidget {
   final dynamic order;
 
   const _ModernOrderCard({required this.order});
 
   @override
+  State<_ModernOrderCard> createState() => _ModernOrderCardState();
+}
+
+class _ModernOrderCardState extends State<_ModernOrderCard> {
+  bool _isUpdating = false;
+
+  String? _getNextStatus(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return 'in_progress';
+      case 'in_progress':
+        return 'completed';
+      default:
+        return null;
+    }
+  }
+
+  String _getNextStatusLabel(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return 'Mulai';
+      case 'in_progress':
+        return 'Selesai';
+      default:
+        return '';
+    }
+  }
+
+  Color _getNextStatusColor(String currentStatus) {
+    switch (currentStatus) {
+      case 'pending':
+        return const Color(0xFF3B82F6);
+      case 'in_progress':
+        return const Color(0xFF10B981);
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Future<void> _updateStatus(BuildContext context) async {
+    final nextStatus = _getNextStatus(widget.order.status);
+    if (nextStatus == null) return;
+
+    setState(() => _isUpdating = true);
+
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final success = await orderProvider.updateOrderStatus(widget.order.id, nextStatus);
+
+    if (!mounted) return;
+    setState(() => _isUpdating = false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? (nextStatus == 'completed'
+                  ? 'Order ${widget.order.orderNumber} selesai'
+                  : 'Order ${widget.order.orderNumber} mulai diproses')
+              : (orderProvider.errorMessage ?? 'Gagal update status'),
+        ),
+        backgroundColor: success ? _getNextStatusColor(widget.order.status) : Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     Color statusColor;
     String statusText;
-    
-    switch (order.status) {
+
+    switch (widget.order.status) {
       case 'pending':
         statusColor = const Color(0xFFF59E0B);
         statusText = 'Pending';
@@ -903,6 +971,8 @@ class _ModernOrderCard extends StatelessWidget {
         statusColor = const Color(0xFF6B7280);
         statusText = 'Unknown';
     }
+
+    final nextStatus = _getNextStatus(widget.order.status);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -937,7 +1007,7 @@ class _ModernOrderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      order.orderNumber,
+                      widget.order.orderNumber,
                       style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         fontSize: 16,
@@ -945,7 +1015,7 @@ class _ModernOrderCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      order.vehicle?.licensePlate ?? 'Unknown Vehicle',
+                      widget.order.vehicle?.licensePlate ?? 'Unknown Vehicle',
                       style: const TextStyle(
                         color: Color(0xFF6B7280),
                         fontSize: 14,
@@ -978,7 +1048,7 @@ class _ModernOrderCard extends StatelessWidget {
               Icon(Icons.cleaning_services_rounded, size: 16, color: Colors.grey.shade500),
               const SizedBox(width: 6),
               Text(
-                order.service?.name ?? 'Unknown Service',
+                widget.order.service?.name ?? 'Unknown Service',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 14,
@@ -987,7 +1057,7 @@ class _ModernOrderCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'Rp ${_formatCurrency(order.totalPrice)}',
+                'Rp ${_formatCurrency(widget.order.totalPrice)}',
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
@@ -996,14 +1066,14 @@ class _ModernOrderCard extends StatelessWidget {
               ),
             ],
           ),
-          if (order.paymentStatus == 'paid') ...[
+          if (widget.order.paymentStatus == 'paid') ...[
             const SizedBox(height: 8),
             Row(
               children: [
                 Icon(Icons.check_circle_rounded, size: 14, color: Colors.green.shade600),
                 const SizedBox(width: 6),
                 Text(
-                  'Paid (${order.paymentMethod?.toUpperCase() ?? 'Unknown'})',
+                  'Paid (${widget.order.paymentMethod?.toUpperCase() ?? 'Unknown'})',
                   style: TextStyle(
                     color: Colors.green.shade600,
                     fontSize: 12,
@@ -1011,6 +1081,49 @@ class _ModernOrderCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ],
+          // Action button for non-completed/non-cancelled orders
+          if (nextStatus != null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isUpdating ? null : () => _updateStatus(context),
+                icon: _isUpdating
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Icon(
+                        nextStatus == 'completed'
+                            ? Icons.check_circle_rounded
+                            : Icons.play_arrow_rounded,
+                        size: 18,
+                      ),
+                label: Text(
+                  _isUpdating
+                      ? 'Memproses...'
+                      : _getNextStatusLabel(widget.order.status),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _getNextStatusColor(widget.order.status),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
+              ),
             ),
           ],
         ],

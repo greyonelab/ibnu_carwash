@@ -35,17 +35,32 @@
 
                 <!-- Position -->
                 <div>
-                    <label for="position" class="block text-sm font-medium text-slate-700 mb-2">
+                    <label for="position_select" class="block text-sm font-medium text-slate-700 mb-2">
                         Posisi <span class="text-red-500">*</span>
                     </label>
-                    <select id="position" name="position" required
+                    @php
+                        $predefinedPositions = ['Washer', 'Detailer', 'Supervisor', 'Manager'];
+                        $oldPosition = old('position', '');
+                        $isCustom = $oldPosition !== '' && !in_array($oldPosition, $predefinedPositions);
+                    @endphp
+                    <select id="position_select" onchange="handlePositionChange(this)"
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('position') border-red-500 @enderror">
                         <option value="">Pilih Posisi</option>
-                        <option value="Washer" {{ old('position') == 'Washer' ? 'selected' : '' }}>Washer</option>
-                        <option value="Detailer" {{ old('position') == 'Detailer' ? 'selected' : '' }}>Detailer</option>
-                        <option value="Supervisor" {{ old('position') == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
-                        <option value="Manager" {{ old('position') == 'Manager' ? 'selected' : '' }}>Manager</option>
+                        <option value="Washer" {{ $oldPosition == 'Washer' ? 'selected' : '' }}>Washer</option>
+                        <option value="Detailer" {{ $oldPosition == 'Detailer' ? 'selected' : '' }}>Detailer</option>
+                        <option value="Supervisor" {{ $oldPosition == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
+                        <option value="Manager" {{ $oldPosition == 'Manager' ? 'selected' : '' }}>Manager</option>
+                        <option value="__custom__" {{ $isCustom ? 'selected' : '' }}>+ Ketik Posisi Lain...</option>
                     </select>
+                    <input type="text" id="position_custom" name="position"
+                        value="{{ $oldPosition }}"
+                        placeholder="Tulis posisi kustom..."
+                        class="{{ $isCustom ? '' : 'hidden' }} mt-2 w-full px-3 py-2 border border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('position') border-red-500 @enderror"
+                        {{ $isCustom ? 'required' : '' }}>
+                    {{-- Hidden input untuk posisi dari dropdown --}}
+                    <input type="hidden" id="position_hidden" name="position"
+                        value="{{ $isCustom ? '' : $oldPosition }}"
+                        {{ $isCustom ? 'disabled' : '' }}>
                     @error('position')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -75,10 +90,28 @@
                     @enderror
                 </div>
 
+                <!-- Commission Rate -->
+                <div>
+                    <label for="commission_rate" class="block text-sm font-medium text-slate-700 mb-2">
+                        Persentase Komisi (%)
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="commission_rate" name="commission_rate"
+                            value="{{ old('commission_rate', 15) }}"
+                            min="0" max="100" step="0.5"
+                            class="w-full px-3 py-2 pr-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('commission_rate') border-red-500 @enderror">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-sm">%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Persentase komisi dari total harga pesanan yang dikerjakan</p>
+                    @error('commission_rate')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Salary -->
                 <div>
                     <label for="salary" class="block text-sm font-medium text-slate-700 mb-2">
-                        Gaji (Rp)
+                        Gaji Pokok (Rp)
                     </label>
                     <input type="number" id="salary" name="salary" value="{{ old('salary') }}" min="0"
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('salary') border-red-500 @enderror">
@@ -88,11 +121,14 @@
                 </div>
 
                 <!-- Status -->
-                <div>
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" name="is_active" value="1" {{ old('is_active') ? 'checked' : '' }}
-                            class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                        <span class="text-sm font-medium text-slate-700">Aktif</span>
+                <div class="flex items-center pt-6">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
+                            class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <div>
+                            <span class="text-sm font-medium text-slate-700">Status Aktif</span>
+                            <p class="text-xs text-slate-500">Karyawan aktif dapat dipilih saat membuat pesanan</p>
+                        </div>
                     </label>
                 </div>
             </div>
@@ -111,4 +147,44 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+function handlePositionChange(select) {
+    const customInput = document.getElementById('position_custom');
+    const hiddenInput = document.getElementById('position_hidden');
+
+    if (select.value === '__custom__') {
+        // Tampilkan input kustom, sembunyikan hidden
+        customInput.classList.remove('hidden');
+        customInput.required = true;
+        customInput.value = '';
+        customInput.focus();
+        hiddenInput.disabled = true;
+        hiddenInput.value = '';
+    } else {
+        // Sembunyikan input kustom, gunakan hidden
+        customInput.classList.add('hidden');
+        customInput.required = false;
+        customInput.value = '';
+        hiddenInput.disabled = false;
+        hiddenInput.value = select.value;
+    }
+}
+
+// Inisialisasi saat halaman load
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('position_select');
+    const customInput = document.getElementById('position_custom');
+    const hiddenInput = document.getElementById('position_hidden');
+
+    // Jika ada nilai kustom (dari old input), pastikan state benar
+    if (!customInput.classList.contains('hidden')) {
+        hiddenInput.disabled = true;
+    } else {
+        hiddenInput.value = select.value !== '__custom__' ? select.value : '';
+    }
+});
+</script>
+@endpush
 @endsection

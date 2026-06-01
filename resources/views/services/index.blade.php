@@ -60,6 +60,10 @@
                         <span class="font-medium text-slate-700">{{ $service->duration_minutes }} menit</span>
                     </div>
                     <div class="flex justify-between items-center">
+                        <span class="text-sm text-slate-500">Kategori:</span>
+                        <span class="font-medium text-slate-700 capitalize">{{ $service->category ?? 'mobil' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
                         <span class="text-sm text-slate-500">Tipe:</span>
                         <span class="font-medium text-slate-700 capitalize">{{ $service->type }}</span>
                     </div>

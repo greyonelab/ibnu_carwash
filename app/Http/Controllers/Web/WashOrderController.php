@@ -74,8 +74,9 @@ class WashOrderController extends Controller
             'additional_fee' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
             'payment_method' => 'nullable|in:cash,qris,transfer',
-            'auto_complete' => 'nullable|boolean',
-            'redirect_to_create' => 'nullable|boolean'
+            'auto_complete' => 'nullable',
+            'redirect_to_create' => 'nullable|boolean',
+            'wash_lane_id' => 'nullable|exists:wash_lanes,id',
         ]);
 
         try {
@@ -129,17 +130,18 @@ class WashOrderController extends Controller
 
                 if ($request->payment_method) {
                     $paymentStatus = 'paid';
-                    if ($request->auto_complete) {
+                    if ($request->auto_complete == '1' || $request->auto_complete === true) {
                         $status = 'completed';
                         $startedAt = now();
                         $completedAt = now();
                         $laneStartedAt = now();
                     } else {
-                        $status = 'in_progress';
+                        // $status = 'in_progress';
+                        $status = 'pending';
                         $startedAt = now();
                         $laneStartedAt = now();
                     }
-                } elseif ($request->auto_complete) {
+                } elseif ($request->auto_complete == '1' || $request->auto_complete === true) {
                     $status = 'completed';
                     $startedAt = now();
                     $completedAt = now();

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'dart:async';
 import '../services/api_service.dart';
 
@@ -82,6 +80,7 @@ class _LicensePlateAutocompleteState extends State<LicensePlateAutocomplete> {
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
   final FocusNode _focusNode = FocusNode();
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
@@ -127,20 +126,16 @@ class _LicensePlateAutocompleteState extends State<LicensePlateAutocomplete> {
     });
 
     try {
-      final response = await ApiService.get('/vehicles/search?q=${Uri.encodeComponent(query)}');
+      final vehicles = await _apiService.searchVehicles(query, widget.selectedVehicleType);
+      setState(() {
+        _suggestions = vehicles.map((json) => VehicleData.fromJson(json)).toList();
+        _isLoading = false;
+      });
       
-      if (response['success']) {
-        final List<dynamic> data = response['data'];
-        setState(() {
-          _suggestions = data.map((json) => VehicleData.fromJson(json)).toList();
-          _isLoading = false;
-        });
-        
-        if (_suggestions.isNotEmpty && _focusNode.hasFocus) {
-          _showOverlay();
-        } else {
-          _removeOverlay();
-        }
+      if (_suggestions.isNotEmpty && _focusNode.hasFocus) {
+        _showOverlay();
+      } else {
+        _removeOverlay();
       }
     } catch (e) {
       setState(() {
@@ -457,6 +452,7 @@ class VehicleHistoryDialog extends StatefulWidget {
 class _VehicleHistoryDialogState extends State<VehicleHistoryDialog> {
   VehicleHistory? _history;
   bool _isLoading = true;
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
@@ -466,11 +462,15 @@ class _VehicleHistoryDialogState extends State<VehicleHistoryDialog> {
 
   Future<void> _loadVehicleHistory() async {
     try {
-      final response = await ApiService.get('/vehicles/${widget.vehicleId}/history');
+      final response = await _apiService.getVehicleHistory(widget.vehicleId);
       
       if (response['success']) {
         setState(() {
           _history = VehicleHistory.fromJson(response['data']);
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
           _isLoading = false;
         });
       }
